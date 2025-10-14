@@ -1,4 +1,4 @@
-# Makeblock Library v3.29.0 - Updated
+# Makeblock Library v3.29.1 - Updated
 
 Arduino Library for Makeblock Electronic Modules
 
@@ -49,6 +49,26 @@ If you have a discussion about licensing issues, please contact me (myan@makeblo
    Auriga <------->  MeAuriga.h
 
    MegaPi <------->  MeMegaPi.h
+
+### IR receiver / Tone (buzzer) conflict
+
+The library includes an IR receiver implementation (`MeIR`) that uses a hardware timer ISR. Some buzzer/tone libraries (for example `Tone` or `ezBuzzer`) use the same AVR timer and will cause a linker error like:
+
+```
+multiple definition of `__vector_13`
+collect2.exe: error: ld returned 1 exit status
+```
+
+To avoid this conflict you can disable the built-in IR interrupt handler. The library provides a small configuration header `src/MeIR_config.h` with a toggle:
+
+1. Open `src/MeIR_config.h` in the library folder.
+2. Uncomment the line `#define ME_IR_DISABLE_ISR` to disable MeIR's ISR.
+3. Restart the Arduino IDE (or PlatformIO) to force a clean library rebuild.
+
+When `ME_IR_DISABLE_ISR` is defined, the MeIR implementation will not define the timer interrupt vector and will not conflict with other libraries that need that timer. You can still use MeIR's send functions; however, receiving via the built-in ISR will be disabled — you'll need to poll `MeIR::loop()` or use another receiver approach if necessary.
+
+If you prefer not to edit the library each time, create a local patch or a config file under your copy of the library (the repository includes `MeIR_config.h` for that purpose).
+
 
 ## New Features in v3.29.0 - Enhanced MeGyro Class
 
