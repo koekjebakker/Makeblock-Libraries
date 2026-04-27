@@ -4,4 +4,4 @@
 // uncomment the following line to disable the ISR implementation in MeIR.cpp
 // (the library will not define the timer interrupt vector).
 //
-#define ME_IR_DISABLE_ISR
+//#define ME_IR_DISABLE_ISR
