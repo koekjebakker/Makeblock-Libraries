@@ -50,13 +50,10 @@
  * Mark Yan        2015/11/02     1.0.2            Fix bug that IRsend and IRreceive can't work at the same time.
  * forfish         2015/11/09     1.0.3            Add description.
  * Mark Yan        2015/11/16     1.0.4            add data recovery when timeout.
- * Nick b          2023/12/05     1.0.5            Added an ignore define to allow the IR to be disabled.
  * </pre>
  *
  */
  
-
-
 #include "MeIR.h"
 
 // Provides ISR
@@ -69,8 +66,6 @@ bool MATCH(uint8_t measured_ticks, uint8_t desired_us)
   // Serial.print(measured_ticks);Serial.print(",");Serial.println(desired_us);
   return(measured_ticks >= desired_us - (desired_us>>2)-1 && measured_ticks <= desired_us + (desired_us>>2)+1);//判断前后25%的误差
 }
-
-#ifndef ME_IR_DISABLE_ISR
 
 ISR(TIMER_INTR_NAME)
 {
@@ -139,8 +134,6 @@ ISR(TIMER_INTR_NAME)
   }
   // irparams.lastTime = new_time;
 }
-
-#endif // !ME_IR_DISABLE_ISR
 
 /**
  * Alternate Constructor which can call your own function to map the IR to arduino port,

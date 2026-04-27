@@ -166,7 +166,6 @@ void MeGyro::setpin(uint8_t AD0, uint8_t INT)
 void MeGyro::begin(void)
 {
   gSensitivity = 65.5; //for 500 deg/s, check data sheet
-  accSensitivity = 16384.0; // for 2g, default value for MPU6050 check data sheet
   gx = 0;
   gy = 0;
   gz = 0;
@@ -176,12 +175,6 @@ void MeGyro::begin(void)
   accX = 0;
   accY = 0;
   accZ = 0;
-  accX = 0;
-  accY = 0;
-  accZ = 0;
-  rawAccX = 0;
-  rawAccY = 0;
-  rawAccZ = 0;
   gyrXoffs = 0;
   gyrYoffs = 0;
   gyrZoffs = 0;
@@ -191,7 +184,6 @@ void MeGyro::begin(void)
   delay(100);
   writeReg(0x1a, 0x01);//configurate the digital low pass filter
   writeReg(0x1b, 0x08);//set the gyro scale to 500 deg/s
-  writeReg(0x1c, 0x00);//set the accelerometer scale to +/- 2g
   delay(100);
   deviceCalibration();
 }
@@ -226,30 +218,19 @@ void MeGyro::update(void)
 
   double ax, ay;
   /* assemble 16 bit sensor data */
-  rawAccX = ( (i2cData[0] << 8) | i2cData[1] );
-  rawAccY = ( (i2cData[2] << 8) | i2cData[3] );
-  rawAccZ = ( (i2cData[4] << 8) | i2cData[5] );
-  
-  rawTemp = ( (i2cData[6] << 8) | i2cData[7] );
-
+  accX = ( (i2cData[0] << 8) | i2cData[1] );
+  accY = ( (i2cData[2] << 8) | i2cData[3] );
+  accZ = ( (i2cData[4] << 8) | i2cData[5] );  
   gyrX = ( ( (i2cData[8] << 8) | i2cData[9] ) - gyrXoffs) / gSensitivity;
   gyrY = ( ( (i2cData[10] << 8) | i2cData[11] ) - gyrYoffs) / gSensitivity;
   gyrZ = ( ( (i2cData[12] << 8) | i2cData[13] ) - gyrZoffs) / gSensitivity;  
-
-  // Calculate acceleration in g units using sensitivity
-  accX = rawAccX / accSensitivity;
-  accY = rawAccY / accSensitivity;
-  accZ = rawAccZ / accSensitivity;
-
-  ax = atan2(rawAccX, sqrt( pow(rawAccY, 2) + pow(rawAccZ, 2) ) ) * 180 / 3.1415926;
-  ay = atan2(rawAccY, sqrt( pow(rawAccX, 2) + pow(rawAccZ, 2) ) ) * 180 / 3.1415926;
-
-  temperature = (rawTemp / 340.0) + 36.53;
+  ax = atan2(accX, sqrt( pow(accY, 2) + pow(accZ, 2) ) ) * 180 / 3.1415926;
+  ay = atan2(accY, sqrt( pow(accX, 2) + pow(accZ, 2) ) ) * 180 / 3.1415926;  
 
   dt = (double)(millis() - last_time) / 1000;
   last_time = millis();
 
-  if(rawAccZ > 0)
+  if(accZ > 0)
   {
     gx = gx - gyrY * dt;
     gy = gy + gyrX * dt;
@@ -310,27 +291,16 @@ void MeGyro::fast_update(void)
 
   double ax, ay;
   /* assemble 16 bit sensor data */
-  rawAccX = ( (i2cData[0] << 8) | i2cData[1] );
-  rawAccY = ( (i2cData[2] << 8) | i2cData[3] );
-  rawAccZ = ( (i2cData[4] << 8) | i2cData[5] );  
-
-  rawTemp = ( (i2cData[6] << 8) | i2cData[7] );
-  
+  accX = ( (i2cData[0] << 8) | i2cData[1] );
+  accY = ( (i2cData[2] << 8) | i2cData[3] );
+  accZ = ( (i2cData[4] << 8) | i2cData[5] );  
   gyrX = ( ( (i2cData[8] << 8) | i2cData[9] ) - gyrXoffs) / gSensitivity;
   gyrY = ( ( (i2cData[10] << 8) | i2cData[11] ) - gyrYoffs) / gSensitivity;
   gyrZ = ( ( (i2cData[12] << 8) | i2cData[13] ) - gyrZoffs) / gSensitivity;  
-  
-  // Calculate acceleration in g units using sensitivity
-  accX = rawAccX / accSensitivity;
-  accY = rawAccY / accSensitivity;
-  accZ = rawAccZ / accSensitivity;
-  
-  ax = atan2(rawAccX, sqrt( pow(rawAccY, 2) + pow(rawAccZ, 2) ) ) * 180 / 3.1415926;
-  ay = atan2(rawAccY, sqrt( pow(rawAccX, 2) + pow(rawAccZ, 2) ) ) * 180 / 3.1415926;  
+  ax = atan2(accX, sqrt( pow(accY, 2) + pow(accZ, 2) ) ) * 180 / 3.1415926;
+  ay = atan2(accY, sqrt( pow(accX, 2) + pow(accZ, 2) ) ) * 180 / 3.1415926;  
 
-  temperature = (rawTemp / 340.0) + 36.53;
-
-  if(rawAccZ > 0)
+  if(accZ > 0)
   {
     gx = gx - gyrY * dt;
     gy = gy + gyrX * dt;
@@ -468,121 +438,6 @@ double MeGyro::getGyroY(void) const
 
 /**
  * \par Function
- *   getGyroZ
- * \par Description
- *   Get the data of gyroZrate.
- * \param[in]
- *   None
- * \par Output
- *   None
- * \return
- *   The data of gyroZrate
- * \par Others
- *   None
- */
-double MeGyro::getGyroZ(void) const
-{
-  return gyrZ;
-}
-
-/**
- * \par Function
- *   getAccX
- * \par Description
- *   Get the acceleration value of X-axis.
- * \param[in]
- *   None
- * \par Output
- *   None
- * \return
- *   The acceleration value of X-axis in g (gravity units)
- * \par Others
- *   X-axis acceleration value is calculated from raw sensor data.
- * \author
- *   Nick B
- */
-double MeGyro::getAccX(void) const
-{
-  return accX;
-}
-
-/**
- * \par Function
- *   getAccY
- * \par Description
- *   Get the acceleration value of Y-axis.
- * \param[in]
- *   None
- * \par Output
- *   None
- * \return
- *   The acceleration value of Y-axis in g (gravity units)
- * \par Others
- *   Y-axis acceleration value is calculated from raw sensor data.
- * \author
- *   Nick B
- */
-double MeGyro::getAccY(void) const
-{
-  return accY;
-}
-
-/**
- * \par Function
- *   getAccZ
- * \par Description
- *   Get the acceleration value of Z-axis.
- * \param[in]
- *   None
- * \par Output
- *   None
- * \return
- *   The acceleration value of Z-axis in g (gravity units)
- * \par Others
- *   Z-axis acceleration value is calculated from raw sensor data.
- * \author
- *   Nick B
- */
-double MeGyro::getAccZ(void) const
-{
-  return accZ;
-}
-
-/**
- * \par Function
- *   getAcc
- * \par Description
- *   Get the acceleration value of setting axis.
- * \param[in]
- *   index - Axis settings(1:X-axis, 2:Y-axis, 3:Z-axis)
- * \par Output
- *   None
- * \return
- *   The acceleration value of setting axis in g (gravity units)
- * \par Others
- *   Acceleration values are calculated from raw sensor data.
- * \author
- *   Nick B
- */
-double MeGyro::getAcc(uint8_t index) const
-{
-  if(index == 1)
-  {
-    return getAccX();
-  }
-  else if(index == 2)
-  {
-    return getAccY();
-  }
-  else if(index == 3)
-  {
-    return getAccZ();
-  }
-  return 0.0; // Default return for invalid index
-}
-
-/**
- * \par Function
  *   getAngle
  * \par Description
  *   Get the angle value of setting axis.
@@ -609,28 +464,6 @@ double MeGyro::getAngle(uint8_t index) const
   {
     return getAngleZ();
   }
-}
-
-/**
- * \par Function
- *   getTemperature
- * \par Description
- *   Get the temperature value from MPU-6050 internal temperature sensor.
- * \param[in]
- *   None
- * \par Output
- *   None
- * \return
- *   The temperature in degrees Celsius
- * \par Others
- *   Temperature is calculated from raw sensor data using the formula:
- *   Temperature = (TEMP_OUT / 340.0) + 36.53
- * \author
- *   Nick B
- */
-double MeGyro::getTemperature(void) const
-{
-  return temperature;
 } 
 
 /**
@@ -788,33 +621,4 @@ int8_t MeGyro::writeData(uint8_t start, const uint8_t *pData, uint8_t size)
   Wire.write(pData, size);  
   return_value = Wire.endTransmission(true); 
   return(return_value); //return: no error                     
-}
-
-/**
- * \par Function
- *   resetData
- * \par Description
- *   Reset the angle value of setting axis.
- * \param[in]
- *  None
- * \par Output
- *   None
- * \return
- *   None
- * \par Others
- *   None
- * \author
- *   Nicolas Bourré
- */  
-void MeGyro::resetData(void)
-{
-  gx = 0;
-  gy = 0;
-  gz = 0;
-  gyrX = 0;
-  gyrY = 0;
-  gyrZ = 0;
-  accX = 0;
-  accY = 0;
-  accZ = 0;
 }

@@ -53,7 +53,6 @@
  * </pre>
  *
  */
-
  
 #ifndef MeIR_h
 #define MeIR_h
@@ -63,11 +62,9 @@
 #include <stdbool.h>
 #include <Arduino.h>
 #include "MeConfig.h"
-#include "MeIR_config.h"
 #ifdef ME_PORT_DEFINED
 #include "MePort.h"
 #endif // ME_PORT_DEFINED
-
 
 #ifndef __AVR_ATmega32U4__
 #define MARK  0
@@ -164,9 +161,6 @@ typedef enum {ERROR = 0, SUCCESS = !ERROR} ErrorStatus;
   TCNT2 = 0; \
 })
 #endif
-
-
-
 
 // information for the interrupt handler
 typedef struct {

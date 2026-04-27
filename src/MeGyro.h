@@ -63,7 +63,6 @@
 
 /* Exported macro ------------------------------------------------------------*/
 #define I2C_ERROR                  (-1)
-
 #define GYRO_DEFAULT_ADDRESS       (0x68)
 
 /**
@@ -294,94 +293,6 @@ public:
 
 /**
  * \par Function
- *   getGyroZ
- * \par Description
- *   Get the data of gyroZrate.
- * \param[in]
- *   None
- * \par Output
- *   None
- * \return
- *   The data of gyroZrate
- * \par Others
- *   None
- */
-  double getGyroZ(void) const;
-
-/**
- * \par Function
- *   getAccX
- * \par Description
- *   Get the acceleration value of X-axis.
- * \param[in]
- *   None
- * \par Output
- *   None
- * \return
- *   The acceleration value of X-axis in g (gravity units)
- * \par Others
- *   X-axis acceleration value is calculated from raw sensor data.
- * \author
- *   Nick B
- */
-  double getAccX(void) const;
-
-/**
- * \par Function
- *   getAccY
- * \par Description
- *   Get the acceleration value of Y-axis.
- * \param[in]
- *   None
- * \par Output
- *   None
- * \return
- *   The acceleration value of Y-axis in g (gravity units)
- * \par Others
- *   Y-axis acceleration value is calculated from raw sensor data.
- * \author
- *   Nick B
- */
-  double getAccY(void) const;
-
-/**
- * \par Function
- *   getAccZ
- * \par Description
- *   Get the acceleration value of Z-axis.
- * \param[in]
- *   None
- * \par Output
- *   None
- * \return
- *   The acceleration value of Z-axis in g (gravity units)
- * \par Others
- *   Z-axis acceleration value is calculated from raw sensor data.
- * \author
- *   Nick B
- */
-  double getAccZ(void) const;
-
-/**
- * \par Function
- *   getAcc
- * \par Description
- *   Get the acceleration value of setting axis.
- * \param[in]
- *   index - Axis settings(1:X-axis, 2:Y-axis, 3:Z-axis)
- * \par Output
- *   None
- * \return
- *   The acceleration value of setting axis in g (gravity units)
- * \par Others
- *   Acceleration values are calculated from raw sensor data.
- * \author
- *   Nick B
- */
-  double getAcc(uint8_t index) const;
-
-/**
- * \par Function
  *   getAngle
  * \par Description
  *   Get the angle value of setting axis.
@@ -396,74 +307,32 @@ public:
  */
   double getAngle(uint8_t index) const;
 
-/**
- * \par Function
- *   getTemperature
- * \par Description
- *   Get the temperature value from MPU-6050 internal temperature sensor.
- * \param[in]
- *   None
- * \par Output
- *   None
- * \return
- *   The temperature in degrees Celsius
- * \par Others
- *   Temperature is calculated from raw sensor data using the formula:
- *   Temperature = (TEMP_OUT / 340.0) + 36.53
- * \author
- *   Nick B
- */
-  double getTemperature(void) const;
-
-
-/**
- * \par Function
- *   resetData
- * \par Description
- *   Reset the angle value of setting axis.
- * \param[in]
- *  None
- * \par Output
- *   None
- * \return
- *   None
- * \par Others
- *   None
- * \author
- *   Nicolas Bourré
- */  
-  void resetData(void);
-
 private:
   volatile uint8_t  _AD0;
   volatile uint8_t  _INT;
   double  gSensitivity; /* for 500 deg/s, check data sheet */
-  double  accSensitivity; /* for 2g, check data sheet */
   double  gx, gy, gz;
   double  gyrX, gyrY, gyrZ;
-  double  accX, accY, accZ;
-  int16_t rawAccX, rawAccY, rawAccZ, rawTemp;
+  int16_t accX, accY, accZ;
   double  gyrXoffs, gyrYoffs, gyrZoffs;
   uint8_t i2cData[14];
   uint8_t Device_Address;
-
-  double temperature;
-
-  /**
-   * \par Function
-   *   deviceCalibration
-   * \par Description
-   *   Calibration function for the MeGyro.
-   * \param[in]
-   *   None
-   * \par Output
-   *   None
-   * \return
-   *   None.
-   * \par Others
-   *   The calibration function will be called in initial process, please keep the
-   *   device in a rest status at that time.
-   */
+  
+/**
+ * \par Function
+ *   deviceCalibration
+ * \par Description
+ *   Calibration function for the MeGyro. 
+ * \param[in]
+ *   None
+ * \par Output
+ *   None
+ * \return
+ *   None.
+ * \par Others
+ *   The calibration function will be called in initial process, please keep the 
+ *   device in a rest status at that time.
+ */
   void deviceCalibration(void);
 
 /**
