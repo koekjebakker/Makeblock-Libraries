@@ -1,4 +1,4 @@
-# Makeblock Library v3.29.1 - Updated
+# Makeblock Library v3.30.0 - Updated
 
 Arduino Library for Makeblock Electronic Modules
 
@@ -49,6 +49,24 @@ If you have a discussion about licensing issues, please contact me (myan@makeblo
    Auriga <------->  MeAuriga.h
 
    MegaPi <------->  MeMegaPi.h
+
+### Include guidance
+
+For sketches and examples, using the board header is the simplest option:
+
+```cpp
+#include <MeAuriga.h>
+```
+
+For reusable classes and custom libraries, prefer including only the module headers you actually use, for example:
+
+```cpp
+#include <MeRGBLed.h>
+#include <MeGyro.h>
+#include <MeSoundSensor.h>
+```
+
+This keeps dependencies smaller and avoids pulling board-level globals into unrelated headers, which helps prevent linker redefinition issues such as `encoder_Port`.
 
 ### IR receiver / Tone (buzzer) conflict
 
@@ -138,6 +156,7 @@ void loop() {
 | Nicolas Bourré |  2023/10/16 | 3.28 | 1. Added missing `gyro.getGyroZ`. 2. Compliant semver.org version number. 3. Added `gyro.resetData` function. 4. Modified the gyro address if it is an Auriga board. |
 | Nicolas Bourré |  2025/04/30 | 3.28.1 | Added the MeRGBLineFollower class. |
 | Nick B |  2025/09/24 | 3.29.0 | 1. Added `getTemperature()` method to MeGyro class for MPU-6050 internal temperature sensor. 2. Added full accelerometer functionality to MeGyro class with `getAccX()`, `getAccY()`, `getAccZ()`, and `getAcc(index)` methods. 3. Fixed multiple definition linker errors by moving MeAuriga global array initializations to .cpp file. 4. Fixed accelerometer initialization by properly configuring register 0x1c for ±2g range. 5. Added AurigaTempSensors example demonstrating dual temperature sensor reading (gyro + onboard NTC). 6. Updated Auriga_MeGyroTest example with Serial Plotter compatibility and comprehensive sensor data display. 7. Enhanced MeGyro class with proper accelerometer sensitivity handling and raw data processing. |
+| koekjesbakker |  2026/05/07 | 3.30.0 | 1. Added the `MeAudioPlayer` class back to the library. 2. Restored the `SimplePlayback` example. 3. Kept the Auriga-related integration changes included with the audio player update. |
 
 # Issues
 
