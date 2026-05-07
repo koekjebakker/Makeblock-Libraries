@@ -1,3 +1,8 @@
+/*
+  For the audioplayer to work, a micro-sd card must be
+  inserted fortmatted with FAT32
+*/
+
 #include <MeMCore.h>
 #include <MeAudioPlayer.h>
 
